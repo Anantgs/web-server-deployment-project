@@ -2,6 +2,7 @@
 
 
 ### create one maven project to deploy web server
+
 - find a maven project for web server deployment
     - run maven commands
     - create a gitlab account
@@ -84,11 +85,10 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
 ```
 
 - We will be able to see this on local machine on following url
+    - http://localhost:8080/hello
 
-- http://localhost:8080/hello
 
-
-- How to deploy it via docker in EC2 instance
+### How to deploy it via docker in EC2 instance
 
 ```
 # Use an official OpenJDK runtime as a base image
