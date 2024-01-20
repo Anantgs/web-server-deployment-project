@@ -83,12 +83,12 @@ SLF4J: Defaulting to no-operation (NOP) logger implementation
 SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
 ```
 
-We will be able to see this on local machine on following url
+- We will be able to see this on local machine on following url
 
-http://localhost:8080/hello
+- http://localhost:8080/hello
 
 
-How to deploy it via docker in EC2 instance
+- How to deploy it via docker in EC2 instance
 
 ```
 # Use an official OpenJDK runtime as a base image
