@@ -86,3 +86,30 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
 We will be able to see this on local machine on following url
 
 http://localhost:8080/hello
+
+
+How to deploy it via docker in EC2 instance
+
+```
+# Use an official OpenJDK runtime as a base image
+FROM openjdk:8-jre-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the JAR file into the container at /app
+COPY target/web-server-example-1.0-SNAPSHOT-jar-with-dependencies.jar /app/
+
+# Expose the port the app runs on
+EXPOSE 8080
+
+# Command to run your application
+CMD ["java", "-jar", "web-server-example-1.0-SNAPSHOT-jar-with-dependencies.jar"]
+
+```
+
+- Build the Docker Image:
+    - docker build -t web-server-example .
+
+- Run the Docker Container:
+    - docker run -p 8080:8080 web-server-example
