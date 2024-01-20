@@ -112,7 +112,11 @@ CMD ["java", "-jar", "web-server-example-1.0-SNAPSHOT-jar-with-dependencies.jar"
 ```
  docker build -t web-server-example .
 ```
+- When you run the docker build command with the -t option to tag the image, the resulting Docker image is stored on your local machine. By default, Docker images are stored locally in the Docker daemon's image storage.
 
+```
+docker images
+```
 - Run the Docker Container:
 ```
 docker run -p 8080:8080 web-server-example
