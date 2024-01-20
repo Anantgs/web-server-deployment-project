@@ -109,7 +109,11 @@ CMD ["java", "-jar", "web-server-example-1.0-SNAPSHOT-jar-with-dependencies.jar"
 ```
 
 - Build the Docker Image:
-    - docker build -t web-server-example .
+```
+ docker build -t web-server-example .
+```
 
 - Run the Docker Container:
-    - docker run -p 8080:8080 web-server-example
+```
+docker run -p 8080:8080 web-server-example
+```
