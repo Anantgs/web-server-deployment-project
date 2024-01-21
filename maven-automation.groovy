@@ -3,8 +3,8 @@ pipeline {
         agent { label 'jenkins-agent' }
 
         environment {
-        DOCKER_IMAGE = 'registry.hub.docker.com/anantgsaraf/centos-aws-cli-image:1.0.1'
-        PYTHON_SCRIPT = 'ami-creation.py'
+        // DOCKER_IMAGE = 'registry.hub.docker.com/anantgsaraf/centos-aws-cli-image:1.0.1'
+        // PYTHON_SCRIPT = 'ami-creation.py'
         MAVEN_HOME = tool 'Maven'
         }
 
