@@ -17,7 +17,7 @@ pipeline {
                     def gitLabCredentialsId = 'gitlab-credentials-id'
 
                     // Clone GitLab repository
-                    withCredentials([usernamePassword(credentialsId: gitLabCredentialsId, usernameVariable: 'anantgsaraf123', passwordVariable: 'Kigo@2022')]) {
+                    withCredentials([usernamePassword(credentialsId: gitLabCredentialsId)]) {
                         git branch: 'main', url: gitLabRepoUrl, credentialsId: gitLabCredentialsId
                     }
 
