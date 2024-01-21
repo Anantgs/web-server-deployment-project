@@ -18,7 +18,7 @@ pipeline {
 
                     // Clone GitLab repository
                     withCredentials([usernamePassword(credentialsId: gitLabCredentialsId)]) {
-                        git branch: 'main', url: gitLabRepoUrl, credentialsId: gitLabCredentialsId
+                        git branch: 'main', url: gitLabRepoUrl, credentialsId: 'gitLabCredentialsId'
                     }
 
                     sh "cd ${env.WORKSPACE} ; ls -l"
