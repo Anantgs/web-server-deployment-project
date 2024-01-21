@@ -28,6 +28,24 @@ pipeline {
             }
         }
 
+        stage('Maven Clean') {
+            steps {
+                sh "${MAVEN_HOME}/bin/mvn clean"
+            }
+        }
+
+        stage('Maven Package') {
+            steps {
+                sh "${MAVEN_HOME}/bin/mvn package"
+            }
+        }
+
+        stage('Maven Exec:Java') {
+            steps {
+                sh "${MAVEN_HOME}/bin/mvn exec:java"
+            }
+        }
+
     }
 
     post {
