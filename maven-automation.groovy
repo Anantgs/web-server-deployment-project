@@ -42,9 +42,15 @@ pipeline {
             }
         }
 
-        stage('Maven Exec:Java') {
+        stage('Docker Build') {
             steps {
-                sh "${MAVEN_HOME}/bin/mvn exec:java"
+                sh "docker build -t web-server-example ."
+            }
+        }
+
+        stage('Docker Run') {
+            steps {
+                sh "docker run -p 8080:8080 -d web-server-example"
             }
         }
 
