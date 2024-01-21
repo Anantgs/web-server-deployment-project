@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent jenkins
 
         environment {
         DOCKER_IMAGE = 'registry.hub.docker.com/anantgsaraf/centos-aws-cli-image:1.0.1'
