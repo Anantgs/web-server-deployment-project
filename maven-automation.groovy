@@ -1,5 +1,5 @@
 pipeline {
-    agent jenkins-agent
+    agent { label 'jenkins-agent' }
 
         environment {
         DOCKER_IMAGE = 'registry.hub.docker.com/anantgsaraf/centos-aws-cli-image:1.0.1'
