@@ -18,7 +18,7 @@ pipeline {
                     sh "echo ${gitLabCredentialsId}"
 
                     // Clone GitLab repository
-                    withCredentials([usernamePassword(credentialsId: gitLabCredentialsId)]) {
+                    withCredentials([usernamePassword(credentialsId: gitLabCredentialsId, usernameVariable: 'GITLAB_USERNAME', passwordVariable: 'GITLAB_PASSWORD' )]) {
                         git branch: 'main', url: gitLabRepoUrl, credentialsId: 'gitLabCredentialsId'
                     }
 
