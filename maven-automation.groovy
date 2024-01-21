@@ -15,6 +15,7 @@ pipeline {
                     // Define GitLab repository and credentials
                     def gitLabRepoUrl = 'https://gitlab.com/devops5113843/web-server-deployment-project.git'
                     def gitLabCredentialsId = 'gitlab-credentials-id'
+                    sh "echo ${gitLabCredentialsId}"
 
                     // Clone GitLab repository
                     withCredentials([usernamePassword(credentialsId: gitLabCredentialsId)]) {
