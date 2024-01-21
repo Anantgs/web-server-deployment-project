@@ -121,3 +121,11 @@ docker images
 ```
 docker run -p 8080:8080 web-server-example
 ```
+- To run the container in detached mode (in the background), you can use the following command:
+```
+docker run -p 8080:8080 -d web-server-example
+```
+- If you want to see the logs of the running container, you can use the docker logs command:
+```
+docker logs <container_id_or_name>
+```
