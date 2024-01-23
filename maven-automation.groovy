@@ -6,6 +6,9 @@ pipeline {
         // DOCKER_IMAGE = 'registry.hub.docker.com/anantgsaraf/centos-aws-cli-image:1.0.1'
         // PYTHON_SCRIPT = 'ami-creation.py'
         MAVEN_HOME = tool 'Maven'
+        DOCKER_IMAGE = 'web-server-example'
+        DOCKER_REGISTRY_CREDENTIALS = credentials('docker-login')
+        NEXUS_REPO_URL = '3.84.159.105:8083'
         }
 
 
@@ -42,17 +45,36 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        // stage('Docker Build') {
+        //     steps {
+        //         sh "docker build -t web-server-example ."
+        //     }
+        // }
+
+
+        stage('Build and Push Docker Image') {
             steps {
-                sh "docker build -t web-server-example ."
+                script {
+                    // Build the Docker image
+                    sh "docker build -t ${DOCKER_IMAGE} ."
+
+                    // Tag the Docker image with Nexus repository URL
+                    sh "docker tag ${DOCKER_IMAGE}:latest ${NEXUS_REPO_URL}/${DOCKER_IMAGE}:latest"
+
+                    // Login to Nexus repository using Jenkins credentials
+                    sh "docker login -u ${DOCKER_REGISTRY_CREDENTIALS_USR} -p ${DOCKER_REGISTRY_CREDENTIALS_PSW} ${NEXUS_REPO_URL}"
+
+                    // Push the Docker image to Nexus
+                    sh "docker push ${NEXUS_REPO_URL}/${DOCKER_IMAGE}:latest"
+                }
             }
         }
 
-        stage('Docker Run') {
-            steps {
-                sh "docker run -p 8080:8080 -d web-server-example"
-            }
-        }
+        // stage('Docker Run') {
+        //     steps {
+        //         sh "docker run -p 8080:8080 -d web-server-example"
+        //     }
+        // }
 
     }
 
