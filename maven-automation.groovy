@@ -8,7 +8,7 @@ pipeline {
         MAVEN_HOME = tool 'Maven'
         DOCKER_IMAGE = 'web-server-example'
         DOCKER_REGISTRY_CREDENTIALS = credentials('docker-login')
-        NEXUS_REPO_URL = '3.84.159.105:8083'
+        NEXUS_REPO_URL = '54.152.98.14:8083'
         }
 
 
