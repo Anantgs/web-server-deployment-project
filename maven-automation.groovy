@@ -93,19 +93,17 @@ pipeline {
             steps {
                 script {
 
-                    
-
                     // Build the Docker image
                     sh "docker build -t ${DOCKER_IMAGE} ."
 
                     // Tag the Docker image with Nexus repository URL
-                    sh "docker tag ${DOCKER_IMAGE}:latest ${ECR_DOCKER_REPO_URL}/${DOCKER_IMAGE}:latest"
+                    sh "docker tag ${DOCKER_IMAGE}:latest ${ECR_DOCKER_REPO_URL}/docker-repository:latest"
 
                     // Login to Nexus repository using Jenkins credentials
                     sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_DOCKER_REPO_URL}"
 
                     // Push the Docker image to Nexus
-                    sh "docker push ${ECR_DOCKER_REPO_URL}/${DOCKER_IMAGE}:latest"
+                    sh "docker push ${ECR_DOCKER_REPO_URL}/docker-repository:latest"
                 }
             }
         }
