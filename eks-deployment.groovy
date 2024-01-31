@@ -68,8 +68,8 @@ pipeline {
                             def kubeAction = params.ACTION == 'create' ? 'create' : 'delete'
 
                             // Run Terraform apply or destroy
-                            sh "kubectl ${kubeAction} -f service.yaml"
-                            sh "kubectl ${kubeAction} -f deployment.yaml"                            
+                            sh "kubectl ${kubeAction} -f service.yaml -n test"
+                            sh "kubectl ${kubeAction} -f deployment.yaml -n test"                            
                     }    
                 }
             }
