@@ -193,6 +193,48 @@ kubectl create secret docker-registry ecr-secret \
   --docker-email=none@example.com -n test
 ```
 
+- Deployment.yaml file 
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: your-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: your-app
+  template:
+    metadata:
+      labels:
+        app: your-app
+    spec:
+      containers:
+        - name: your-container
+          image: 23423424234234.dkr.ecr.us-west-1.amazonaws.com/docker-repository:latest
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: ecr-secret
+```
+
+- service.yaml file
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: your-service
+spec:
+  selector:
+    app: your-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+```
+
 ```
 kubectl get service -n test
 NAME           TYPE           CLUSTER-IP       EXTERNAL-IP                                                             PORT(S)        AGE
