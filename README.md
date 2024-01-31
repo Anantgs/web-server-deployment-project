@@ -129,3 +129,81 @@ docker run -p 8080:8080 -d web-server-example
 ```
 docker logs <container_id_or_name>
 ```
+
+### How To Deploy the microservice to EKS cluster
+
+- With The help of groovy script in this project you will be able to create the docker image and upload it to ECR
+
+- Create EKS cluster from this repo [here](https://gitlab.com/devops5113843/terraform-eks)
+
+- Install kubectl on your machine 
+
+```
+[root create-eks-cluster]# aws configure
+AWS Access Key ID [****************5OHB]: <access key id>
+AWS Secret Access Key [****************7Jt9]: <secret key id>
+Default region name [us-east-1]:
+Default output format [None]:
+[root create-eks-cluster]#
+```
+- Login to eks cluster 
+
+```
+aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster
+```
+```
+kubectl create ns test
+```
+### How to setup ECR and deploy image to EKS
+
+- ECR Repository Policy : Ensure that your ECR repository has a policy that allows your EKS cluster to pull images.
+The policy should include the EKS cluster's node IAM role.For example, create an ECR repository policy like this:
+
+```
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ecr.amazonaws.com"
+      },
+      "Action": "ecr:GetAuthorizationToken"
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ecr.amazonaws.com"
+      },
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage"
+      ]
+    }
+  ]
+}
+```
+
+```
+kubectl create secret docker-registry ecr-secret \
+  --docker-server=ecr-repo-url \
+  --docker-username=AWS \
+  --docker-password="$(aws ecr get-login-password --region us-east-1)" \
+  --docker-email=none@example.com -n test
+```
+
+```
+kubectl get service -n test
+NAME           TYPE           CLUSTER-IP       EXTERNAL-IP                                                             PORT(S)        AGE
+your-service   LoadBalancer   10.100.195.215   adedeew132313scdscsdcds-211212assdsfsfsdd.us-east-1.elb.amazonaws.com   80:31915/TCP   52m
+```
+
+How to check:
+
+```
+http://adedeew132313scdscsdcds-211212assdsfsfsdd.us-east-1.elb.amazonaws.com/hello
+```
+
+![alt text](Images/elb.png "Title Text")
+
