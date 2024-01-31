@@ -41,7 +41,7 @@ pipeline {
         //     }
         // }
 
-        stage('Terraform Init') {
+        stage('Kube Init') {
             steps {
                 script {
                     // Run Terraform init
@@ -51,7 +51,7 @@ pipeline {
                     sh 'aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster'
                     sh 'kubectl create ns test'
                     sh 'kubectl create secret docker-registry ecr-secret \
-                        --docker-server=ecr-repo-url \
+                        --docker-server=576582406082.dkr.ecr.us-east-1.amazonaws.com/docker-repository:latest \
                         --docker-username=AWS \
                         --docker-password="$(aws ecr get-login-password --region us-east-1)" \
                         --docker-email=none@example.com -n test'
@@ -60,7 +60,7 @@ pipeline {
             }
         }
 
-        stage('Terraform Action') {
+        stage('Kube Action') {
             steps {
                 script {
                     dir('Kubernetes-deployments') {  

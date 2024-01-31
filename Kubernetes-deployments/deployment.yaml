@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: your-container
-          image: 23423424234234.dkr.ecr.us-west-1.amazonaws.com/docker-repository:latest
+          image: 576582406082.dkr.ecr.us-east-1.amazonaws.com/docker-repository:latest
           ports:
             - containerPort: 8080
       imagePullSecrets:
