@@ -70,9 +70,16 @@ pipeline {
                             // Run Terraform apply or destroy
                             // sh "kubectl ${kubeAction} -f load-balancer-service.yaml -n test"
                             sh "kubectl ${kubeAction} -f deployment.yaml -n test"
-                            sh "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx"
+                            // sh "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx"
                             // sh "kubectl ${kubeAction} -f web-app-ingress.yaml -n test"
-                            sh "kubectl ${kubeAction} -f web-app-svc.yaml -n test"                            
+                            sh "kubectl ${kubeAction} -f web-app-svc.yaml -n test" 
+
+                            if (kubeAction == 'create') {
+                                sh "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx"
+                            } else {
+                                sh "kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx"
+                            }                            
+
                     }    
                 }
             }
