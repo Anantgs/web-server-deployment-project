@@ -249,3 +249,52 @@ http://adedeew132313scdscsdcds-211212assdsfsfsdd.us-east-1.elb.amazonaws.com/hel
 
 ![alt text](Images/elb.png "Title Text")
 
+### How to deploy ingress controller and access application using it
+
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx
+```
+
+```
+[root@ip-172-31-25-208 Kubernetes-deployments]#
+[root@ip-172-31-25-208 Kubernetes-deployments]#  kubectl get all -n ingress-nginx
+NAME                                            READY   STATUS      RESTARTS   AGE
+pod/ingress-nginx-admission-create-tdn58        0/1     Completed   0          39m
+pod/ingress-nginx-admission-patch-t7h8m         0/1     Completed   0          39m
+pod/ingress-nginx-controller-68fb8cf9cc-mj9mn   1/1     Running     0          39m
+
+NAME                                         TYPE           CLUSTER-IP       EXTERNAL-IP                                                                     PORT(S)                      AGE
+service/ingress-nginx-controller             LoadBalancer   10.100.248.172   ad77a35f17d1746d0a62db02bb7f5229-3f82c3c988648419.elb.us-east-1.amazonaws.com   80:31241/TCP,443:32172/TCP   39m
+service/ingress-nginx-controller-admission   ClusterIP      10.100.33.109    <none>                                                                          443/TCP                      39m
+
+NAME                                       READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/ingress-nginx-controller   1/1     1            1           39m
+
+NAME                                                  DESIRED   CURRENT   READY   AGE
+replicaset.apps/ingress-nginx-controller-68fb8cf9cc   1         1         1       39m
+
+NAME                                       COMPLETIONS   DURATION   AGE
+job.batch/ingress-nginx-admission-create   1/1           5s         39m
+job.batch/ingress-nginx-admission-patch    1/1           6s         39m
+[root@ip-172-31-25-208 Kubernetes-deployments]#
+```
+
+```
+[root@ip-172-31-25-208 Kubernetes-deployments]# kubectl get ingress -n test
+NAME           CLASS    HOSTS                                                                           ADDRESS                                                                         PORTS   AGE
+your-ingress   <none>   ad77a35f17d1746d0a62db02bb7f5229-3f82c3c988648419.elb.us-east-1.amazonaws.com   ad77a35f17d1746d0a62db02bb7f5229-3f82c3c988648419.elb.us-east-1.amazonaws.com   80      3h22m
+[root@ip-172-31-25-208 Kubernetes-deployments]#
+```
+
+```
+[root@ip-172-31-25-208 Kubernetes-deployments]# kubectl get svc -n test
+NAME           TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+your-service   ClusterIP   10.100.19.63   <none>        8080/TCP   4h33m
+[root@ip-172-31-25-208 Kubernetes-deployments]#
+```
+
+- To Debug
+
+```
+kubectl logs ingress-nginx-controller-68fb8cf9cc-mj9mn -n ingress-nginx
+```
