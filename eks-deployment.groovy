@@ -69,21 +69,34 @@ pipeline {
 
                             // Run Terraform apply or destroy
                             // sh "kubectl ${kubeAction} -f load-balancer-service.yaml -n test"
-                            sh "kubectl ${kubeAction} ns test"
-                            sh '''kubectl ${kubeAction} secret docker-registry ecr-secret \
-                            --docker-server=576582406082.dkr.ecr.us-east-1.amazonaws.com/docker-repository:latest \
-                            --docker-username=AWS \
-                            --docker-password="$(aws ecr get-login-password --region us-east-1)" \
-                            --docker-email=none@example.com -n test'''
-                            sh "kubectl ${kubeAction} -f deployment.yaml -n test"
-                            // sh "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx"
-                            // sh "kubectl ${kubeAction} -f web-app-ingress.yaml -n test"
-                            sh "kubectl ${kubeAction} -f web-app-svc.yaml -n test" 
+                            // sh "kubectl ${kubeAction} ns test"
+                            // sh '''kubectl ${kubeAction} secret docker-registry ecr-secret \
+                            // --docker-server=576582406082.dkr.ecr.us-east-1.amazonaws.com/docker-repository:latest \
+                            // --docker-username=AWS \
+                            // --docker-password="$(aws ecr get-login-password --region us-east-1)" \
+                            // --docker-email=none@example.com -n test'''
+                            // sh "kubectl ${kubeAction} -f deployment.yaml -n test"
+                            // // sh "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx"
+                            // // sh "kubectl ${kubeAction} -f web-app-ingress.yaml -n test"
+                            // sh "kubectl ${kubeAction} -f web-app-svc.yaml -n test" 
 
                             if (kubeAction == 'create') {
                                 sh "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx"
+
+                                sh "kubectl create ns test"
+                                sh '''kubectl create secret docker-registry ecr-secret \
+                                --docker-server=576582406082.dkr.ecr.us-east-1.amazonaws.com/docker-repository:latest \
+                                --docker-username=AWS \
+                                --docker-password="$(aws ecr get-login-password --region us-east-1)" \
+                                --docker-email=none@example.com -n test'''
+                                sh "kubectl create -f deployment.yaml -n test"
+                                sh "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx"
+                                // sh "kubectl ${kubeAction} -f web-app-ingress.yaml -n test"
+                                sh "kubectl create -f web-app-svc.yaml -n test"                             
+
                             } else {
                                 sh "kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx"
+                                sh "kubectl delete ns test"
                             }                            
 
                     }    
