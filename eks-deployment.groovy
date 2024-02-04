@@ -70,7 +70,7 @@ pipeline {
                             // Run Terraform apply or destroy
                             // sh "kubectl ${kubeAction} -f load-balancer-service.yaml -n test"
                             sh "kubectl ${kubeAction} ns test"
-                            sh "kubectl ${kubeAction} secret docker-registry ecr-secret \
+                            sh "kubectl \${kubeAction} secret docker-registry ecr-secret \
                                 --docker-server=576582406082.dkr.ecr.us-east-1.amazonaws.com/docker-repository:latest \
                                 --docker-username=AWS \
                                 --docker-password='$(aws ecr get-login-password --region us-east-1)' \
