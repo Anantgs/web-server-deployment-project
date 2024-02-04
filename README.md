@@ -251,6 +251,8 @@ http://adedeew132313scdscsdcds-211212assdsfsfsdd.us-east-1.elb.amazonaws.com/hel
 
 ### How to deploy ingress controller and access application using it
 
+- You can check document here : https://kubernetes.github.io/ingress-nginx/deploy/#network-load-balancer-nlb ----> go to AWS section
+
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx
 ```
