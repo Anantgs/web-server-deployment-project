@@ -49,12 +49,12 @@ pipeline {
                   dir('Kubernetes-deployments') {  
                     sh 'ls -l'
                     sh 'aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster'
-                    sh 'kubectl create ns test'
-                    sh 'kubectl create secret docker-registry ecr-secret \
-                        --docker-server=576582406082.dkr.ecr.us-east-1.amazonaws.com/docker-repository:latest \
-                        --docker-username=AWS \
-                        --docker-password="$(aws ecr get-login-password --region us-east-1)" \
-                        --docker-email=none@example.com -n test'
+                    // sh 'kubectl create ns test'
+                    // sh 'kubectl create secret docker-registry ecr-secret \
+                    //     --docker-server=576582406082.dkr.ecr.us-east-1.amazonaws.com/docker-repository:latest \
+                    //     --docker-username=AWS \
+                    //     --docker-password="$(aws ecr get-login-password --region us-east-1)" \
+                    //     --docker-email=none@example.com -n test'
                   } 
                 }
             }
@@ -69,6 +69,12 @@ pipeline {
 
                             // Run Terraform apply or destroy
                             // sh "kubectl ${kubeAction} -f load-balancer-service.yaml -n test"
+                            sh "kubectl ${kubeAction} ns test"
+                            sh "kubectl ${kubeAction} secret docker-registry ecr-secret \
+                                --docker-server=576582406082.dkr.ecr.us-east-1.amazonaws.com/docker-repository:latest \
+                                --docker-username=AWS \
+                                --docker-password="$(aws ecr get-login-password --region us-east-1)" \
+                                --docker-email=none@example.com -n test"                            
                             sh "kubectl ${kubeAction} -f deployment.yaml -n test"
                             // sh "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/aws/deploy.yaml -n ingress-nginx"
                             // sh "kubectl ${kubeAction} -f web-app-ingress.yaml -n test"
