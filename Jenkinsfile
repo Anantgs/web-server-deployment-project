@@ -17,7 +17,7 @@ pipeline {
         serviceName = 'app-base-python3.12-alpine3.20'
         // registry = 'nexus.theguru.in.net:8082'
         registry = 'docker.io/anantgsaraf'
-        container_registry_auth = "nexus-auth"
+        // container_registry_auth = "nexus-auth"
         // version="1"
         platform = "linux/amd64,linux/arm64"
 
