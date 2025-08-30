@@ -102,8 +102,9 @@ pipeline {
 
                         // Build and push the Docker image using buildx
                         sh """
-                            docker buildx build --platform ${platform} -f ${dockerfile} -t ${registry}/${image}:${imageVersion} --push ${buildPath}
+                            docker buildx build --platform ${platform} -f ${dockerfile} -t ${image}:${imageVersion} --push ${buildPath}
                         """
+                        // docker buildx build --platform ${platform} -f ${dockerfile} -t ${registry}/${image}:${imageVersion} --push ${buildPath}
 
                     }
                 }
