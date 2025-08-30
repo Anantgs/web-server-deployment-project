@@ -38,9 +38,10 @@ pipeline {
                             version = env.GIT_BRANCH.replaceAll("/", "-") + '-' + 'snapshot' + "-" + env.GIT_COMMIT.take(6)
                             version = version.toLowerCase()
                             sh """
-                            echo test@1234 | docker login -u anantgsaraf --password-stdin ${registry}
+                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin ${registry}
                             echo $version
                             """
+                            // echo test@1234 | docker login -u anantgsaraf --password-stdin ${registry}
                         }
                     }
                 }    
