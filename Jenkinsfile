@@ -88,6 +88,24 @@ pipeline {
                             // sh "nslookup index.docker.io"
                             // sh "ping -c 3 index.docker.io"
 
+                            // Add debug output
+                            sh """
+                                echo "Debug: DOCKER_USER = $DOCKER_USER"
+                                echo "Debug: Registry = ${registry}"
+                                echo "Debug: Credentials ID = ${container_registry_auth}"
+                            """
+                            
+                            // Test authentication first
+                            sh """
+                                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin ${registry}
+                                
+                                # Verify login worked
+                                docker info | grep -i username
+                                
+                                # Test if we can pull a public image
+                                docker pull hello-world
+                            """
+
                             // ✅ use """ so Groovy variables expand
                             sh """
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin ${registry}
