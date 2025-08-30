@@ -48,6 +48,26 @@ pipeline {
             }
         }
 
+        stage('Maven Clean') {
+            steps {
+                container('maven') {
+                    script {
+                        sh "${MAVEN_HOME}/bin/mvn clean"
+                    }
+                }
+            }
+        }
+
+        stage('Maven Package') {
+            steps {
+                container('maven') {
+                    script {
+                        sh "${MAVEN_HOME}/bin/mvn package"
+                    }
+                }
+            }
+        }
+
         stage('Determine Image Version') {
             steps {
                 container('docker-build') {
