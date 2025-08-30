@@ -52,7 +52,7 @@ pipeline {
             steps {
                 container('maven') {
                     script {
-                        sh "${MAVEN_HOME}/bin/mvn clean"
+                        sh "mvn clean"
                     }
                 }
             }
@@ -62,7 +62,7 @@ pipeline {
             steps {
                 container('maven') {
                     script {
-                        sh "${MAVEN_HOME}/bin/mvn package"
+                        sh "mvn package"
                     }
                 }
             }
