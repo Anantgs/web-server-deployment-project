@@ -85,14 +85,14 @@ pipeline {
                             def image = env.serviceName   // "web-app"
 
                             sh "docker buildx create --use --bootstrap --driver docker-container"
-                            sh "nslookup index.docker.io"
-                            sh "ping -c 3 index.docker.io"
+                            // sh "nslookup index.docker.io"
+                            // sh "ping -c 3 index.docker.io"
 
                             // ✅ use """ so Groovy variables expand
                             sh """
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin ${registry}
                                 docker buildx build --platform ${platform} -f ${dockerfile} \
-                                  -t ${registry}/${image_prefix}/${image}:${imageVersion} \
+                                  --progress=plain -t ${registry}/${image_prefix}/${image}:${imageVersion} \
                                   --push ${buildPath}
                             """
                         }
