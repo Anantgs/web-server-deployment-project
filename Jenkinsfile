@@ -110,14 +110,13 @@ pipeline {
                         def image = env.serviceName
                         def image_prefix = env.image_prefix
 
-                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin ${registry}"
-
                         sh "docker buildx create --use --bootstrap --driver docker-container"
 
                         // Build and push the Docker image using buildx
-                        sh """
-                            docker buildx build --platform ${platform} -f ${dockerfile} -t ${registry}/${image}:${imageVersion} --push ${buildPath}
-                        """
+                        sh '''
+                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin "${registry}"
+                            docker buildx build --platform "${platform}" -f "${dockerfile}" -t "${registry}/${image}:${imageVersion}" --push "${buildPath}"
+                        '''
                         // docker buildx build --platform ${platform} -f ${dockerfile} -t ${registry}/${image}:${imageVersion} --push ${buildPath}
 
 
