@@ -80,12 +80,14 @@ pipeline {
                             def gitCommitShort = env.GIT_COMMIT.substring(0, 6)
                             def prefix = (branchName == 'master' || branchName == 'main') ? 'release' : 'feature'
                             def imageVersion = "${prefix}-${gitCommitShort}"
-        
+
                             def buildPath = sh(script: "dirname ${dockerfile}", returnStdout: true).trim()
                             def image = env.serviceName   // "web-app"
-        
+
                             sh "docker buildx create --use --bootstrap --driver docker-container"
-        
+                            sh "nslookup index.docker.io"
+                            sh "ping -c 3 index.docker.io"
+
                             // ✅ use """ so Groovy variables expand
                             sh """
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin ${registry}
@@ -98,7 +100,7 @@ pipeline {
                 }
             }
         }
-        
+
 
     }
 }
