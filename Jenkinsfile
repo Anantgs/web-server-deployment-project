@@ -1,125 +1,92 @@
+@Library('jenkins-shared-libraries@master')_
 pipeline {
 
-        agent { label 'jenkins-agent' }
-
-        environment {
-        // DOCKER_IMAGE = 'registry.hub.docker.com/anantgsaraf/centos-aws-cli-image:1.0.1'
-        // PYTHON_SCRIPT = 'ami-creation.py'
-        MAVEN_HOME = tool 'Maven'
-        DOCKER_IMAGE = 'web-server-example'
-        DOCKER_REGISTRY_CREDENTIALS = credentials('docker-login')
-        NEXUS_REPO_URL = '54.152.98.14:8083'
-        ECR_DOCKER_REPO_URL = '576582406082.dkr.ecr.us-east-1.amazonaws.com'
-        AWS_DEFAULT_REGION = 'us-east-1'
+    agent {
+        kubernetes {
+            yaml libraryResource('jenkins/agents/agent-docker-hub.yaml')
         }
+    }
 
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timestamps()
+        timeout(time: 30, unit: 'MINUTES')
+    }
+
+    environment {
+        serviceName = 'app-base-python3.12-alpine3.20'
+        // registry = 'nexus.theguru.in.net:8082'
+        registry = 'docker.io/anantgsaraf'
+        container_registry_auth = "nexus-auth"
+        // version="1"
+        platform = "linux/amd64,linux/arm64"
+
+        cosign_key = "slm-cosign-key"
+        cosign_pub = "slm-cosign-pub"
+        cosign_key_pass = "slm-cosign-password"
+        dockerfile = "Dockerfile"
+    }
 
     stages {
 
-        stage('Clone from GitLab') {
+        stage('Docker Login') {
             steps {
-                script {
-                    // Define GitLab repository and credentials
-                    def gitLabRepoUrl = 'https://gitlab.com/devops5113843/web-server-deployment-project.git'
-                    def gitLabCredentialsId = 'gitlab-credentials-id'
-                    sh "echo ${gitLabCredentialsId}"
+                container('docker-build') {                
+                    script {
+                        withCredentials([usernamePassword(credentialsId: "${container_registry_auth}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                            version = env.GIT_BRANCH.replaceAll("/", "-") + '-' + 'snapshot' + "-" + env.GIT_COMMIT.take(6)
+                            version = version.toLowerCase()
+                            sh """
+                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin ${registry}
+                            echo $version
+                            """
+                        }
+                    }
+                }    
+            }
+        }
 
-                    // Clone GitLab repository
-                    //withCredentials([usernamePassword(credentialsId: gitLabCredentialsId, usernameVariable: 'GITLAB_USERNAME', passwordVariable: 'GITLAB_PASSWORD' )]) {
-                    //    git branch: 'main', url: gitLabRepoUrl, credentialsId: 'gitLabCredentialsId'
-                    //}
+        stage('Determine Image Version') {
+            steps {
+                container('docker-build') {
+                    script {
+                        // Define the function to generate the image version
+                        sh 'sleep 20'
 
-                    sh "cd ${env.WORKSPACE} ; ls -l"
+                        def getImageVersion = {
+                            // Extract the branch name from env.GIT_BRANCH
+                            def branchName = (env.GIT_BRANCH =~ /refs\/heads\/(.*)/) ? (env.GIT_BRANCH.split('/').last()) : 'unknown'
 
+                            // Extract the last 5 characters of the Git commit hash
+                            def gitCommitShort = env.GIT_COMMIT.substring(0, 5)
+
+                            // Determine the prefix based on the branch name
+                            def prefix = (branchName == 'master' || branchName == 'main') ? 'release' : 'feature'
+
+                            // Combine prefix and short commit hash
+                            return "${prefix}-${gitCommitShort}"
+                        }
+
+                        // Generate and log the image version
+                        def imageVersion = getImageVersion()
+                        echo "Image version: ${imageVersion}"
+
+                        // Resolve build path from dockerfile
+                        def buildPath = sh(script: "dirname ${dockerfile}", returnStdout: true).trim()
+                        echo "Build path: ${buildPath}"
+                        def image = env.serviceName
+
+                        sh "docker buildx create --use --bootstrap --driver docker-container"
+
+                        // Build and push the Docker image using buildx
+                        sh """
+                            docker buildx build --platform ${platform} -f ${dockerfile} -t ${registry}/${image}:${imageVersion} --push ${buildPath}
+                        """
+
+                    }
                 }
             }
         }
 
-        stage('Configure AWS') {
-            steps {
-                withCredentials([[
-                                    $class: 'AmazonWebServicesCredentialsBinding',
-                                    credentialsId: "AWS-CREDENTIALS",
-                                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                                ]]){
-                                    
-                    // Your AWS-related steps here
-                    //sh 'aws s3 ls' // Example AWS CLI command
-                    echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}"
-                    echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}"                    
-                }
-            }
-        }
-
-        stage('Maven Clean') {
-            steps {
-                sh "${MAVEN_HOME}/bin/mvn clean"
-            }
-        }
-
-        stage('Maven Package') {
-            steps {
-                sh "${MAVEN_HOME}/bin/mvn package"
-            }
-        }
-
-        // stage('Docker Build') {
-        //     steps {
-        //         sh "docker build -t web-server-example ."
-        //     }
-        // }
-
-
-        // stage('Build and Push Docker Image') {
-        //     steps {
-        //         script {
-        //             // Build the Docker image
-        //             sh "docker build -t ${DOCKER_IMAGE} ."
-
-        //             // Tag the Docker image with Nexus repository URL
-        //             sh "docker tag ${DOCKER_IMAGE}:latest ${NEXUS_REPO_URL}/${DOCKER_IMAGE}:latest"
-
-        //             // Login to Nexus repository using Jenkins credentials
-        //             sh "docker login -u ${DOCKER_REGISTRY_CREDENTIALS_USR} -p ${DOCKER_REGISTRY_CREDENTIALS_PSW} ${NEXUS_REPO_URL}"
-
-        //             // Push the Docker image to Nexus
-        //             sh "docker push ${NEXUS_REPO_URL}/${DOCKER_IMAGE}:latest"
-        //         }
-        //     }
-        // }
-
-        stage('Build and Push Docker Image to ecr') {
-            steps {
-                script {
-
-                    // Build the Docker image
-                    sh "docker build -t ${DOCKER_IMAGE} ."
-
-                    // Tag the Docker image with Nexus repository URL
-                    sh "docker tag ${DOCKER_IMAGE}:latest ${ECR_DOCKER_REPO_URL}/docker-repository:latest"
-
-                    // Login to Nexus repository using Jenkins credentials
-                    sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_DOCKER_REPO_URL}"
-
-                    // Push the Docker image to Nexus
-                    sh "docker push ${ECR_DOCKER_REPO_URL}/docker-repository:latest"
-                }
-            }
-        }
-
-        // stage('Docker Run') {
-        //     steps {
-        //         sh "docker run -p 8080:8080 -d web-server-example"
-        //     }
-        // }
-
-    }
-
-    post {
-        always {
-            // Clean up
-            cleanWs()
-        }
     }
 }
