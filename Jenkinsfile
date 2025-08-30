@@ -109,12 +109,14 @@ pipeline {
                         echo "Build path: ${buildPath}"
                         def image = env.serviceName
                         def image_prefix = env.image_prefix
+                        
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin ${registry}
 
                         sh "docker buildx create --use --bootstrap --driver docker-container"
 
                         // Build and push the Docker image using buildx
                         sh """
-                            docker buildx build --platform ${platform} -f ${dockerfile} -t ${image_prefix}/${image}:${imageVersion} --push ${buildPath}
+                            docker buildx build --platform ${platform} -f ${dockerfile} -t ${registry}/${image}:${imageVersion} --push ${buildPath}
                         """
                         // docker buildx build --platform ${platform} -f ${dockerfile} -t ${registry}/${image}:${imageVersion} --push ${buildPath}
 
