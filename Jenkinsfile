@@ -16,7 +16,7 @@ pipeline {
     environment {
         serviceName = 'web-app'
         // registry = 'nexus.theguru.in.net:8082'
-        registry = 'docker.io/anantgsaraf'
+        registry = 'docker.io'
         image_prefix = 'anantgsaraf'
         // container_registry_auth = "nexus-auth"
         container_registry_auth = "docker_auth"
@@ -83,6 +83,7 @@ pipeline {
 
                             def buildPath = sh(script: "dirname ${dockerfile}", returnStdout: true).trim()
                             def image = env.serviceName   // "web-app"
+                            def image_prefix = env.image_prefix  // "anantgsaraf"
 
                             sh "docker buildx create --use --bootstrap --driver docker-container"
                             // sh "nslookup index.docker.io"
@@ -94,14 +95,14 @@ pipeline {
                                 echo "Debug: Registry = ${registry}"
                                 echo "Debug: Credentials ID = ${container_registry_auth}"
                             """
-                            
+
                             // Test authentication first
                             sh """
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin ${registry}
-                                
+
                                 # Verify login worked
                                 docker info | grep -i username
-                                
+
                                 # Test if we can pull a public image
                                 docker pull hello-world
                             """
@@ -110,7 +111,7 @@ pipeline {
                             sh """
                                 echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin ${registry}
                                 docker buildx build --platform ${platform} -f ${dockerfile} \
-                                  --progress=plain -t ${registry}/${image}:${imageVersion} \
+                                  --progress=plain -t ${registry}/${image_prefix}/${image}:${imageVersion} \
                                   --push ${buildPath}
                             """
                         }
