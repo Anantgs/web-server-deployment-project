@@ -17,6 +17,7 @@ pipeline {
         serviceName = 'app-base-python3.12-alpine3.20'
         // registry = 'nexus.theguru.in.net:8082'
         registry = 'docker.io/anantgsaraf'
+        image_prefix = 'anantgsaraf'
         // container_registry_auth = "nexus-auth"
         container_registry_auth = "docker_auth"
         // version="1"
@@ -97,12 +98,13 @@ pipeline {
                         def buildPath = sh(script: "dirname ${dockerfile}", returnStdout: true).trim()
                         echo "Build path: ${buildPath}"
                         def image = env.serviceName
+                        def prefix = env.image_prefix
 
                         sh "docker buildx create --use --bootstrap --driver docker-container"
 
                         // Build and push the Docker image using buildx
                         sh """
-                            docker buildx build --platform ${platform} -f ${dockerfile} -t ${image}:${imageVersion} --push ${buildPath}
+                            docker buildx build --platform ${platform} -f ${dockerfile} -t ${prefix}/${image}:${imageVersion} --push ${buildPath}
                         """
                         // docker buildx build --platform ${platform} -f ${dockerfile} -t ${registry}/${image}:${imageVersion} --push ${buildPath}
 
