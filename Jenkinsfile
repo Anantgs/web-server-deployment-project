@@ -109,8 +109,8 @@ pipeline {
                         echo "Build path: ${buildPath}"
                         def image = env.serviceName
                         def image_prefix = env.image_prefix
-                        
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin ${registry}
+
+                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin ${registry}"
 
                         sh "docker buildx create --use --bootstrap --driver docker-container"
 
