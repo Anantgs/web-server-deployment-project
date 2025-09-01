@@ -16,6 +16,7 @@ pipeline {
         image_prefix = 'anantgsaraf'
         AWS_DEFAULT_REGION = 'us-east-1'
         dockerfile = "Dockerfile"
+        platform = "linux/amd64,linux/arm64"
         }
 
 
