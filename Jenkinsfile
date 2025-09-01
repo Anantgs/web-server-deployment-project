@@ -8,7 +8,7 @@ pipeline {
         // MAVEN_HOME = tool 'Maven'
         serviceName = 'web-server-example'
         // DOCKER_REGISTRY_CREDENTIALS = credentials('docker-login')
-        DOCKER_REGISTRY_CREDENTIALS = credentials('docker_auth')
+        DOCKER_REGISTRY_CREDENTIALS = 'docker_auth'
         // NEXUS_REPO_URL = '54.152.98.14:8083'
         // ECR_DOCKER_REPO_URL = '576582406082.dkr.ecr.us-east-1.amazonaws.com'
         ECR_DOCKER_REPO_URL = 'docker.io'
@@ -96,7 +96,7 @@ pipeline {
         stage('Build and Push Docker Image to ecr') {
             steps {
                     script {
-                        withCredentials([usernamePassword(credentialsId: "${docker_auth}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDENTIALS}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         
                             // Generate image version
                             def branchName = (env.GIT_BRANCH =~ /refs\/heads\/(.*)/) ? (env.GIT_BRANCH.split('/').last()) : 'unknown'
