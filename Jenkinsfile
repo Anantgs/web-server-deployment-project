@@ -118,7 +118,7 @@ pipeline {
                             sh """
                                 echo "Debug: DOCKER_USER = $DOCKER_USER"
                                 echo "Debug: Registry = ${registry}"
-                                echo "Debug: Credentials ID = ${container_registry_auth}"
+                                echo "Debug: Credentials ID = ${DOCKER_REGISTRY_CREDENTIALS}"
                             """
 
                             // Test authentication first
