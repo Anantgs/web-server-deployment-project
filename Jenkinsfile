@@ -14,6 +14,7 @@ pipeline {
         ECR_DOCKER_REPO_URL = 'docker.io'
         image_prefix = 'anantgsaraf'
         AWS_DEFAULT_REGION = 'us-east-1'
+        dockerfile = "Dockerfile"
         }
 
 
