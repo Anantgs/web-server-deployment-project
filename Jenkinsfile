@@ -51,7 +51,7 @@ pipeline {
                     //sh 'aws s3 ls' // Example AWS CLI command
                     echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}"
                     echo "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}"  
-                    aws list regions --output table
+                    sh 'aws ec2 describe-regions --all-regions --output table'
                 }
             }
         }
