@@ -6,7 +6,7 @@ pipeline {
         // DOCKER_IMAGE = 'registry.hub.docker.com/anantgsaraf/centos-aws-cli-image:1.0.1'
         // PYTHON_SCRIPT = 'ami-creation.py'
         // MAVEN_HOME = tool 'Maven'
-        DOCKER_IMAGE = 'web-server-example'
+        serviceName = 'web-server-example'
         // DOCKER_REGISTRY_CREDENTIALS = credentials('docker-login')
         DOCKER_REGISTRY_CREDENTIALS = credentials('docker_auth')
         // NEXUS_REPO_URL = '54.152.98.14:8083'
@@ -95,23 +95,53 @@ pipeline {
 
         stage('Build and Push Docker Image to ecr') {
             steps {
-                script {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: "${docker_auth}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        
+                            // Generate image version
+                            def branchName = (env.GIT_BRANCH =~ /refs\/heads\/(.*)/) ? (env.GIT_BRANCH.split('/').last()) : 'unknown'
+                            def gitCommitShort = env.GIT_COMMIT.substring(0, 6)
+                            def prefix = (branchName == 'master' || branchName == 'main') ? 'release' : 'feature'
+                            def imageVersion = "${prefix}-${gitCommitShort}"
 
-                    // Build the Docker image
-                    sh "docker build -t ${DOCKER_IMAGE} ."
+                            def buildPath = sh(script: "dirname ${dockerfile}", returnStdout: true).trim()
+                            def image = env.serviceName   // "web-app"
+                            def image_prefix = env.image_prefix  // "anantgsaraf"
 
-                    // Tag the Docker image with Nexus repository URL
-                    sh "docker tag ${DOCKER_IMAGE}:latest ${ECR_DOCKER_REPO_URL}/docker-repository:latest"
+                            sh "docker buildx create --use --bootstrap --driver docker-container"
+                            // sh "nslookup index.docker.io"
+                            // sh "ping -c 3 index.docker.io"
 
-                    // Login to Nexus repository using Jenkins credentials
-                    // sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_DOCKER_REPO_URL}"
-                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin "$ECR_DOCKER_REPO_URL" '
+                            // Add debug output
+                            sh """
+                                echo "Debug: DOCKER_USER = $DOCKER_USER"
+                                echo "Debug: Registry = ${registry}"
+                                echo "Debug: Credentials ID = ${container_registry_auth}"
+                            """
 
-                    // Push the Docker image to Nexus
-                    sh "docker push ${ECR_DOCKER_REPO_URL}/${image_prefix}/docker-repository:latest"
-                }
+                            // Test authentication first
+                            sh """
+                                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin ${registry}
+
+                                # Verify login worked
+                                docker info | grep -i username
+
+                                # Test if we can pull a public image
+                                docker pull hello-world
+                            """
+
+                            // ✅ use """ so Groovy variables expand
+                            sh """
+                                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin ${registry}
+                                docker buildx build --platform ${platform} -f ${dockerfile} \
+                                  --progress=plain -t ${registry}/${image_prefix}/${image}:${imageVersion} \
+                                  --push ${buildPath}
+                            """
+                        }
+                    }
             }
         }
+
 
         // stage('Docker Run') {
         //     steps {
